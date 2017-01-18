@@ -4,6 +4,11 @@ parameters:
 #    parameter_name: value
 
 services:
-#    service_name:
-#        class: AppBundle\Directory\ClassName
-#        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+    chaton:
+        class: AppBundle\Application
+        arguments:
+            - "@chaton.chat"
+            - "@event_dispatcher"
+
+    chaton.chat:
+        class: AppBundle\Chat\Chat\ConsoleChat
