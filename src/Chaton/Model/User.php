@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Chat;
+namespace Chaton\Model;
 
 /**
  * Information about a user

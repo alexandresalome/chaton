@@ -1,8 +1,8 @@
 <?php
 
-namespace AppBundle;
+namespace Chaton;
 
-use AppBundle\Chat\Message;
+use Chaton\Model\Message;
 use Symfony\Component\EventDispatcher\Event;
 
 class ChatEvent extends Event

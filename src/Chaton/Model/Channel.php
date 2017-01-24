@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Chat;
+namespace Chaton\Model;
 
 class Channel
 {
@@ -11,6 +11,11 @@ class Channel
     {
         $this->id = $id;
         $this->private = $private;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function isPrivate()
