@@ -10,9 +10,15 @@ class User
     private $id;
     private $options;
 
-    public function __construct(string $id, array $options = [])
+    /**
+     * @var ChatInterface
+     */
+    private $chat;
+
+    public function __construct(ChatInterface $chat, string $id, array $options = [])
     {
         $this->id = $id;
         $this->options = $options;
+        $this->chat = $chat;
     }
 }

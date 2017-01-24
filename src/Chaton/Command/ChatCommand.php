@@ -3,15 +3,26 @@
 namespace Chaton\Command;
 
 use Chaton\Chat\ConsoleChat;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Chaton\Chaton;
+use React\EventLoop\Factory;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command to execute chaton with a command line.
  */
-class ChatCommand extends ContainerAwareCommand
+class ChatCommand extends Command
 {
+    private $chaton;
+
+    public function __construct(Chaton $chaton)
+    {
+        parent::__construct();
+
+        $this->chaton = $chaton;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -27,10 +38,8 @@ class ChatCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $chaton = $this->getContainer()->get('chaton');
-
         $chat = new ConsoleChat($input, $output);
-        $chaton->addChat($chat);
-        $chaton->run();
+        $this->chaton->addChat($chat);
+        $this->chaton->run();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace BobMarlexBundle;
+namespace Chaton\Extensions\BobMarlex;
 
 use Chaton\Extension;
 

@@ -11,7 +11,7 @@ class Extension
         return $message;
     }
 
-    public function handle(Message $message) : bool
+    public function handle(Chaton $chaton, Message $message) : bool
     {
         return false;
     }

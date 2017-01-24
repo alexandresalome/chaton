@@ -5,10 +5,14 @@ parameters:
 
 services:
     chaton:
-        class: AppBundle\Application
+        class: Chaton\Chaton
         arguments:
-            - "@chaton.chat"
-            - "@event_dispatcher"
+            - [ ]
+            - "@logger"
 
-    chaton.chat:
-        class: AppBundle\Chat\Chat\ConsoleChat
+    command.chat:
+        class: Chaton\Command\ChatCommand
+        arguments:
+            - "@chaton"
+        tags:
+            - { name: "console.command" }

@@ -19,11 +19,20 @@ class Message
      */
     private $message;
 
-    public function __construct(User $user, Channel $channel, string $message)
+    private $options;
+
+    /**
+     * @var ChatInterface
+     */
+    private $chat;
+
+    public function __construct(ChatInterface $chat, User $user, Channel $channel, string $message, array $options = array())
     {
         $this->user = $user;
         $this->channel = $channel;
         $this->message = $message;
+        $this->options = $options;
+        $this->chat = $chat;
     }
 
     /**
@@ -48,5 +57,12 @@ class Message
     public function getMessage()
     {
         return $this->message;
+    }
+
+
+    public function reply(string $message)
+    {
+        echo 'reply $message';
+        //$this->chat->sendMessage();
     }
 }

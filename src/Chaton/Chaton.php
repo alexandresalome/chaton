@@ -3,12 +3,13 @@
 namespace Chaton;
 
 
-use BobMarlexBundle\BobMarlexExtension;
+use Chaton\Extensions\BobMarlex\BobMarlexExtension;
 use Chaton\Model\ChatInterface;
 use Chaton\Model\Message;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use React\EventLoop\Factory;
+use React\EventLoop\LibEventLoop;
 
 class Chaton
 {
@@ -33,6 +34,11 @@ class Chaton
      * @var boolean
      */
     private $started = false;
+
+    /**
+     * @var LibEventLoop
+     */
+    private $loop;
 
     /**
      * @param Extension[] $extensions
@@ -69,6 +75,7 @@ class Chaton
 
         $this->logger->debug(sprintf("New chat added: \"%s\".", get_class($chat)));
         $this->chats[] = $chat;
+        $this->loop = Factory::create();
 
         return $this;
     }
@@ -110,6 +117,8 @@ class Chaton
      */
     public function run()
     {
+
+        $this->loop->run();
     }
 
     /**
@@ -117,6 +126,8 @@ class Chaton
      */
     public function tick()
     {
+        $this->loop->tick();
+
         if ($this->chatCursor === false && count($this->chats) !== 0) {
             $this->chatCursor = reset($this->chats);
         }
@@ -169,5 +180,10 @@ class Chaton
                 break;
             }
         }
+    }
+
+    public function sendMessage($statusCode)
+    {
+
     }
 }
