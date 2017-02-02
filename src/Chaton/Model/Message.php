@@ -62,7 +62,12 @@ class Message
 
     public function reply(string $message)
     {
-        echo 'reply $message';
-        //$this->chat->sendMessage();
+        $msg = new Message($this->chat, $this->user, $this->channel, $message); // todo: pas $this->user
+        $this->chat->sendMessage($msg);
+    }
+
+    public function __toString()
+    {
+        return $this->message;
     }
 }

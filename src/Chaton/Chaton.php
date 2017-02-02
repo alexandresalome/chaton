@@ -4,12 +4,15 @@ namespace Chaton;
 
 
 use Chaton\Extensions\BobMarlex\BobMarlexExtension;
+use Chaton\Extensions\Curl\CurlExtension;
 use Chaton\Model\ChatInterface;
 use Chaton\Model\Message;
+use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use React\EventLoop\Factory;
 use React\EventLoop\LibEventLoop;
+use React\EventLoop\Timer\Timer;
 
 class Chaton
 {
@@ -41,6 +44,13 @@ class Chaton
     private $loop;
 
     /**
+     * @var Timer<string>
+     */
+    private $timers = [];
+
+    private $debugTickCounter = 0;
+
+    /**
      * @param Extension[] $extensions
      * @param LoggerInterface $logger
      */
@@ -48,7 +58,8 @@ class Chaton
     {
         if (empty($extensions)) {
             $extensions = array(
-                new BobMarlexExtension()
+                new BobMarlexExtension(),
+                new CurlExtension()
             );
         }
 
@@ -117,8 +128,14 @@ class Chaton
      */
     public function run()
     {
+        if (!$this->started) {
+            $this->start();
+        }
 
-        $this->loop->run();
+        while (true) {
+            $this->tick();
+            usleep(10000);
+        }
     }
 
     /**
@@ -127,6 +144,11 @@ class Chaton
     public function tick()
     {
         $this->loop->tick();
+
+        $this->debugTickCounter = ($this->debugTickCounter + 1) % 100;
+        if ($this->debugTickCounter == 0) {
+            $this->logger->debug("1000 ticks executed");
+        }
 
         if ($this->chatCursor === false && count($this->chats) !== 0) {
             $this->chatCursor = reset($this->chats);
@@ -155,35 +177,54 @@ class Chaton
 
         // apply input filters
         foreach ($this->extensions as $extension) {
-            $new = $extension->filterInput($message);
-            if (!$new instanceof Message) {
-                $this->logger->info(sprintf(
-                    "Message skipped by extension \"%s\".",
-                    $message,
-                    get_class($extension)
-                ));
-
-                return;
-            }
-            $message = $new;
+            $message = $extension->filterInput($message);
         }
 
         // find an answer
+        $handled = false;
+
         foreach ($this->extensions as $extension) {
-            if ($extension->handle($message)) {
+            if ($extension->handle($this, $message)) {
                 $this->logger->info(sprintf(
                     "Message handled by extension \"%s\".",
                     $message,
                     get_class($extension)
                 ));
 
+                $handled = true;
                 break;
             }
+        }
+
+        if (!$handled) {
+            $this->logger->debug('Message was not handled by any extension.');
         }
     }
 
     public function sendMessage($statusCode)
     {
 
+    }
+
+    public function httpGet(string $url, callable $callback)
+    {
+        $id = md5(uniqid().microtime(true));
+
+        $this->logger->debug('HTTP GET '.$url);
+
+        $client = new Client();
+        $promise = $client->getAsync($url);
+        $promise->then($callback);
+
+        $this->timers[$id] = $this->loop->addPeriodicTimer(1, function () use ($promise, $id) {
+            echo "loop\n";
+            $state = $promise->getState();
+            echo $state."\n";
+            if ($state === "looool") {
+                $timer = $this->timers[$id];
+                $timer->cancel();
+                unset($this->timers[$id]);
+            }
+        });
     }
 }

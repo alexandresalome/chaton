@@ -12,14 +12,17 @@ class CurlExtension extends Extension
 
     public function handle(Chaton $chaton, Message $message): bool
     {
-        if (preg_match(self::CURL_PATTERN, $message->getMessage(), $vars)) {
-            $url = $vars[1];
-
-            $chaton->httpGet($url, function($response) use ($message) {
-                $message->reply();
-            });
-
-            return true;
+        if (!preg_match(self::CURL_PATTERN, $message->getMessage(), $vars)) {
+            return false;
         }
+
+        $url = $vars[1];
+        $message->reply("OK, let me check status code for ".$url);
+
+        $chaton->httpGet($url, function($response) use ($message) {
+            $message->reply("Status code is ".$response->getStatusCode());
+        });
+
+        return true;
     }
 }
