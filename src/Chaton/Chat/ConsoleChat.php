@@ -61,6 +61,7 @@ class ConsoleChat implements ChatInterface
 
         $this->stdin = fopen('php://stdin', 'r');
         stream_set_blocking($this->stdin, false);
+        $this->output->write("< ");
     }
 
     /**
@@ -85,7 +86,7 @@ class ConsoleChat implements ChatInterface
 
     public function sendMessage(Message $message)
     {
-        echo($message);
+        // typed text still appear after pressing enter
     }
 
     /**

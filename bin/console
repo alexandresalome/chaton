@@ -1,28 +1,26 @@
 #!/usr/bin/env php
 <?php
 
-use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Chaton\Chat\ConsoleChat;
+use Chaton\Command\ChatCommand;
+use Chaton\Chaton;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Logger\ConsoleLogger;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Debug\Debug;
 
-// if you don't want to setup permissions the proper way, just uncomment the following PHP line
-// read http://symfony.com/doc/current/setup.html#checking-symfony-application-configuration-and-setup
-// for more information
-//umask(0000);
+require __DIR__.'/../vendor/autoload.php';
 
-set_time_limit(0);
-
-/** @var Composer\Autoload\ClassLoader $loader */
-$loader = require __DIR__.'/../app/autoload.php';
+Debug::enable();
 
 $input = new ArgvInput();
-$env = $input->getParameterOption(['--env', '-e'], getenv('SYMFONY_ENV') ?: 'dev');
-$debug = getenv('SYMFONY_DEBUG') !== '0' && !$input->hasParameterOption(['--no-debug', '']) && $env !== 'prod';
+$output = new ConsoleOutput();
+$logger = new ConsoleLogger($output);
 
-if ($debug) {
-    Debug::enable();
-}
+$chaton = new Chaton([], $logger);
 
-$kernel = new AppKernel($env, $debug);
-$application = new Application($kernel);
-$application->run($input);
+$application = new Application("chaton", "alpha");
+$application->add(new ChatCommand($chaton));
+
+$application->run($input, $output);
