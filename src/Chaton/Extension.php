@@ -6,6 +6,10 @@ use Chaton\Model\Message;
 
 class Extension
 {
+    public function register(Chaton $chaton)
+    {
+    }
+
     public function filterInput(Message $message) : Message
     {
         return $message;
